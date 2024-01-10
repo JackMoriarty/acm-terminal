@@ -132,16 +132,15 @@ substring lenght, e.g.:
                 (truncate-string-to-width line width 0 ?\s))
               (split-string (buffer-string) "\n")))))
 
-(defun acm-terminal-default-background ()
-  (or (face-background 'acm-terminal-default-face)
-      (pcase (face-background 'default)
-        ("unspecified-bg" "white")
-        (`,color color))))
+(defun acm-terminal-default-background (&optional force)
+  (if (or force (equal (face-attribute 'acm-terminal-default-face :background) 'unspecified))
+      (face-attribute 'default :background)
+    (face-attribute 'acm-terminal-default-face :background)))
 
 (defun acm-terminal-init-colors (&optional force)
   (let* ((is-dark-mode (string-equal (acm-frame-get-theme-mode) "dark"))
          (blend-background (if is-dark-mode "#000000" "#AAAAAA"))
-         (default-background (acm-terminal-default-background)))
+         (default-background (acm-terminal-default-background force)))
     ;; Make sure menu follow the theme of Emacs.
     (when (or force (equal (face-attribute 'acm-terminal-default-face :background) 'unspecified))
       (set-face-background 'acm-terminal-default-face (acm-frame-color-blend default-background blend-background (if is-dark-mode 0.8 0.9))))
